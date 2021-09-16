@@ -79,7 +79,7 @@ if (bookBtn) {
 if (photoSelect) {
   photoSelect.addEventListener('change', function () {
     const file = this.files[0];
-    console.log(file);
+    // console.log(file);
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.addEventListener('load', function () {

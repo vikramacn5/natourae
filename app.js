@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp'); // http parameter pollution
 const cookieParser = require('cookie-parser');
 const csp = require('express-csp');
+const compression = require('compression');
 
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
@@ -183,6 +184,12 @@ app.use(
     ],
   })
 );
+
+// ------------------------------------------------------- //
+
+// ------------------- Test middleware ------------------- //
+
+app.use(compression());
 
 // ------------------------------------------------------- //
 
