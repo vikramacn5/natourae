@@ -9,6 +9,7 @@ const hpp = require('hpp'); // http parameter pollution
 const cookieParser = require('cookie-parser');
 const csp = require('express-csp');
 const compression = require('compression');
+const cors = require('cors');
 
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
@@ -32,6 +33,51 @@ to use the path.join() function. */
 // ======================================================= //
 // ------------------ GLOBAL MIDDLEWARES ----------------- //
 // ======================================================= //
+
+// -------------------- Implement cors ------------------- //
+
+// ---------------------- FIRST PART --------------------- //
+
+/* What this does is to just set some headers to the request 
+and the main one for cors is Access-Control-Allow-Origin and 
+sets the value to eveerything and everything here means all 
+the requests no matter where they come from. We could actualy 
+implement cors to specific routes alone by just adding the 
+cors() middleware to that specific route middleware stack */
+app.use(cors());
+// Access-Control-Allow-Origin = *
+
+/* We could also set origins, for example if we have our api 
+hosted on a different domain and our front end is hosted on 
+a different domain, we want to allow cross origin only to the 
+requests that are comming from the domain in which our 
+frontend is hosted */
+// app.use(cors(), {
+//   origin: 'https://www.natours.com' // frontend domain
+// })
+
+// --------------------- SECOND PART --------------------- //
+
+/* In the first part it allows cors only for simple 
+reqests(get, post) and for other non-simple requests(put, 
+  patch, delete, requests with cookie, requests with no 
+  standard headers) it won't. When these non-simple requests 
+  are actually made the browser automatically issues a 
+  pre-flight phase. So before the real request happens the 
+  browser actually makes an options request which is just 
+  another HTTP method just like get, post, put, delete. So 
+  when this options request is made to our server, as a 
+  developer we need to send a respose and what we need to 
+  send back is the same Access-Control-Allow-Origin header 
+  and when it gets that it will know that this request is 
+  safe to be allowed and the actualy sends the real request. 
+  We could allow these non-simple requests for all the routes 
+  or on just some specific routes alone. */
+
+app.options('*', cors()); // This allows non-simple or complex requests on all the routes
+// app.options('/api/v1/tours/:id', cors()); // This allows this non-simple requests only on this routes
+
+// ------------------------------------------------------- //
 
 // ----------------- Serving static files ---------------- //
 
