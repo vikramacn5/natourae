@@ -92,3 +92,35 @@ process.on('unhandledRejection', (err) => {
 });
 
 // ------------------------------------------------------- //
+
+// ======================================================= //
+// --------- Handling SIGTERM signal form heroku --------- //
+// ======================================================= //
+
+/* SIGTERM is basicall an event that will be sent by the 
+heroku for each and every 24 hours. Heroku basically shuts 
+does and restarts the dyno (which is basically a term that 
+  heroku uses to describe the container in which our 
+  application runs) for each and every 24 hours in order to 
+  keep our app in an healthy state and heroku does ths by 
+  sending a signal to our node app and this signal is 
+  actually an event that our application can listen to and 
+  respond or handle it and that event is called as SIGTERM. 
+  But the problem with this is that it shuts down the 
+  application abruptly but we don't want our application to 
+  leavve all the pending requests to hanging in the air 
+  unhandled so we need to listen for that signal and should 
+  shut down the application gracefully. This is also a 
+  politely waay of asking the application to shutdown. We 
+  don't use the process.exit() like we did before because 
+  the SIGTERM itself actually shuts down the application on 
+  it's own. */
+
+process.on('SIGTERM', () => {
+  console.log('👋🏻 SIGTERM RECEIVED. Shutting down gracefully');
+  server.close(() => {
+    console.log('💣 Process terminated');
+  });
+});
+
+// ------------------------------------------------------- //
