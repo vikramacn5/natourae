@@ -17,6 +17,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
 const viewRouter = require('./routes/viewRoutes');
 
 // Start express app
@@ -180,6 +181,17 @@ with /api */
 // ------------------------------------------------------- //
 
 // -- Body parser, reading data from body into req.body -- //
+
+/* This need to be done here because we want to parse the 
+value from the request o body in a raw format inorder for 
+this to work. If this is done after express.json(), then the 
+value will be parsed into body in json format and we don't 
+want that */
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout
+);
 
 app.use(express.json({ limit: '10kb' })); // limiting the amount of incomming data
 
