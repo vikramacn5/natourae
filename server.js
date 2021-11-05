@@ -16,6 +16,9 @@ process.on('uncaughtException', (err) => {
   */
   console.log('UNCAUGHT EXCEPTION! 💣 Shutting down...!');
   console.log(err.name, err.message);
+  /* Here we don't need the server to close because these 
+  errors uncaught exceptions are not asynchronous errors and 
+  they don't have anything to do with the server actually */
   process.exit(1);
 });
 
@@ -87,7 +90,7 @@ process.on('unhandledRejection', (err) => {
   /* These are kind of standard properties that are available
    on all errors in node.js */
   server.close(() => {
-    process.exit(1); // exitting with code 1 is the usual.
+    process.exit(1); // exitting with endcode 1 is the usual. zero stands for success and 1 stands for uncaught eception.
   });
 });
 

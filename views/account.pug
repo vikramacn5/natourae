@@ -32,7 +32,8 @@ block content
 
           //- WITHOUT API
           //- form.form.form-user-data(action = '/submit-user-data' method= 'POST' enctype = 'multipart/form-data')
-          
+          //- In oreder to send the data automatically we need to give the method and action attribute on the form element. There are actually many ways in sending the data but the default one is url encoded which is encoding the data in the url bit like query string. The second step is to give the name attributes on the input fields that we are gonna send so that when the post request is made the data will be sent as per the name attribute. Here in this case the request contains only the name and email in the body since they are the only fields that contains name attribute
+
           //- WITH API
           form.form.form-user-data
             .form__group

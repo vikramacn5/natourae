@@ -37,9 +37,15 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     // }&user=${req.user.id}&price=${tour.price}`,
     success_url: `${req.protocol}://${req.get('host')}/my-tours?alert=booking`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
-    customer_email: req.user.email, // saves a stem for user and makes the payment process more smoother
-    client_reference_id: req.params.tourId, // extra field into which we can actually specify the values which we would want into the session object when the purchase is done for updating he bookings into the database
-    // information about the product that the user is purchasing
+    customer_email: req.user.email, // saves a step for user and makes the payment process more smoother
+    client_reference_id: req.params.tourId,
+    /* extra field into which we can specify the 
+    values which we would want into the session object when the purchase is done for 
+    updating he bookings into the database */
+
+    /* information about the product that the user is 
+    purchasing so that thhey can be used in the checkout page 
+    annd as wellas in the dashboard of tthe stripe service */
     line_items: [
       {
         name: `${tour.name} Tour`,
@@ -71,20 +77,26 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 // });
 
 const createBookingCheckout = async (session) => {
+  /* This session is exactly the session that we created by 
+  ourself in the getCheckoutSession function */
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email })).id;
   const price = session.amount_total / 100;
+  /* amount_total will be in cents and we need to convert 
+  that into dollars */
 
   await Booking.create({ tour, user, price });
 };
 
-exports.webhookCheckout = (req, res, next) => {
+exports.webhookCheckout = async (req, res, next) => {
+  /* When stripe make the post request to this route it 
+  actually sends a signature for this webhook in the header */
   const signature = req.headers['stripe-signature'];
 
   let event;
   try {
     event = stripe.webhooks.constructEvent(
-      req.body,
+      req.body, // body need to ne in raw format(String)
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
@@ -93,8 +105,10 @@ exports.webhookCheckout = (req, res, next) => {
   }
 
   if (event.type === 'checkout.session.completed') {
-    createBookingCheckout(event.data.object);
-
-    res.status(200).json({ received: true });
+    /* Checking if the event is exacty same as what we 
+    specified in the stripe dashboard */
+    await createBookingCheckout(event.data.object);
+    // this is the session object
   }
+  res.status(200).json({ received: true });
 };

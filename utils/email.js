@@ -47,7 +47,10 @@ module.exports = class Email {
       to: this.to,
       subject,
       html,
-      text: htmlToText.fromString(html),
+      text: htmlToText.convert(html),
+      /* We need to have text version of the email into the 
+      email, that is better for email delivery rates and also 
+      for spam folders */
     };
 
     // 3. Create a transport and send email

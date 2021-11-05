@@ -123,13 +123,58 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
-// tourSchema.index({ price: 1 });
-tourSchema.index({ price: 1, ratingsAverage: -1 });
+/* By default we get an index for the id and this id index 
+is an ordered list of all the id's stored somewhere outside 
+of the collection. So whenever we query for documents by ID 
+it does not have to search the whole collection by going one 
+by one on all hte documents, it just searches this ordered 
+list which is very efficient. So we can actually set indxes 
+for some fields on our own of we are querying for that field 
+a lot. The ID's should always have to unique because the 
+index of ID has a unique property, which is a property tha 
+twe can give to our fields. As per our schema definition 
+above we will also have an index for the name field 
+automatically why because we have defined the name field as 
+unique and because of that what mongo does behind the scenes 
+in order to ensure the uniqueness of the field is to create 
+a unique index for it and so because of that not only the id 
+but name should also have to be unque. when we create an 
+index for a single field, it is called as ingle field index, 
+this is used when we query a lot for that particular field 
+but if we query more often for a field along with another 
+field then using a compound field makes more sense. When we 
+use compound index we don't have to create indexes 
+individually for each of the field that were used in 
+compound index as the indexing would work individualy too 
+when using compound index. Indexing should not be done on all 
+the fields we need to carefully study the data access 
+patterns in our application in order to figure out which 
+field is being queried the most and then as per that we need 
+to set the indexes. Setting up indexes actually takes up 
+memory and every time we update a document in that 
+collection then it also updates the index, so we need to be 
+sure while indexing a field, of a collection is written onto 
+more that querying then it clearly out weighs the benefit of 
+creating the index and actually keeping it on the memory 
+because it needs to be updated each and every time when we 
+update a document form that collection. So in summary when 
+indexing we need to balance the frequency of query made with 
+that field and the cost of indexing that field and also the 
+write/read ratio of that collection. */
+
+// tourSchema.index({ price: 1 }); // this is called single field index
+tourSchema.index({ price: 1, ratingsAverage: -1 }); // compound index
 tourSchema.index({ slug: 1 });
 
 /* '2dsphere' if the data describes a real point on a earth 
 like sphere or we can use '2d' if the data describes some 
-fictional points on the 2dimensional plane */
+fictional points on the 2dimensional plane. Also we know that 
+these index are ordered list stored outside of the collection 
+and this list will be in ascending order if the index is 1 
+and it will be ordered in descending order if the index is -1 
+but now we want the index for startLocation field to be 
+ordere as per 2d sphere (earth like structure) that is why 
+the index for this is 2d sphere. */
 tourSchema.index({ startLocation: '2dsphere' });
 
 tourSchema.virtual('durationWeeks').get(function () {

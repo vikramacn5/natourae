@@ -55,6 +55,10 @@ export const logout = async () => {
       url: '/api/v1/users/logout',
     });
     if (res.data.status === 'success') location.reload(true);
+    /* true is important here as it will load the frest page 
+    from the server itslef, if we don't give that then it 
+    will load the same page from the browser cache and the user menu 
+    will still be there. */
   } catch (err) {
     console.log(err.response);
     showAlert('error', 'Error logging out! Try again.');

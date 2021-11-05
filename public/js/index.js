@@ -39,6 +39,9 @@ if (logOutBtn) {
 if (userDataForm) {
   userDataForm.addEventListener('submit', (e) => {
     e.preventDefault();
+    /* Making this form as a multipart form data 
+    programatically so that it allows us to upload the 
+    files as well through the form */
     const form = new FormData();
     form.append('name', document.getElementById('name').value);
     form.append('email', document.getElementById('email').value);

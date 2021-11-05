@@ -182,11 +182,17 @@ with /api */
 
 // -- Body parser, reading data from body into req.body -- //
 
-/* This need to be done here because we want to parse the 
+/* The stripe service will send a post request to our 
+application once the checkout is successfully completed also 
+with the request it also sends an event that we set it their 
+dashboard and the event is checkoout session completed. 
+This need to be done here because we want to parse the 
 value from the request o body in a raw format inorder for 
 this to work. If this is done after express.json(), then the 
 value will be parsed into body in json format and we don't 
-want that */
+want that. The stripe function that we are gonna use to read 
+this checkout data in the handler needs this one to be in 
+raw format else it won't work. */
 app.post(
   '/webhook-checkout',
   express.raw({ type: 'application/json' }),
@@ -199,7 +205,13 @@ app.use(express.json({ limit: '10kb' })); // limiting the amount of incomming da
 
 // --------------------- URL encoded --------------------- //
 
-// parses the data from the form and puts into the req.body
+/* parses the data from the form and puts into the req.body. 
+This middleware is called as url encoded because that is the 
+default way of sending the data from a direct post request 
+from the form and extended: true allows us to pass some more 
+complex data but we don't need that in this case but even 
+though we have added it aand also we have set the input 
+limit. */
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // ------------------------------------------------------- //

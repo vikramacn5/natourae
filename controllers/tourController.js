@@ -22,8 +22,8 @@ const upload = multer({
 
 /* Use this when there is a mix of fields in the upload */
 exports.uploadTourImages = upload.fields([
-  { name: 'imageCover', maxCount: 1 },
-  { name: 'images', maxCount: 3 },
+  { name: 'imageCover', maxCount: 1 }, // maxCount: 1 means only one field with this name is allowed in the input
+  { name: 'images', maxCount: 3 }, // maxCount: 3 means only three fields with this name is allowed in the input
 ]);
 
 /* Use this when we are uploading only one field which has 
@@ -38,6 +38,8 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
   /* in case of multiple files we use req.files. 
   upload.single puts the file into req.file but upload.array 
   and upload.fields puts the files into req.files */
+
+  if (!req.files.imageCover || !req.files.images) return next();
 
   // 1. Cover image
   req.body.imageCover = `tour-${req.params.id}-${Date.now()}cover.jpeg`;
@@ -184,6 +186,26 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
   const tours = await Tour.find({
     startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
   });
+  /* geoWithin is a geospatial operator used to perform 
+  geospatial operations which is similar to math operaor 
+  used to perform math operations. goeWithin actually does 
+  what is says finds the tour document within a geometry and 
+  the next step is actually we need to specify the geometry 
+  so that t can query within that geometry. Here the 
+  geometry that we have chosen is centerSphere which is 
+  again an operator so it takes its own object, now we need 
+  to pass in the required information to the geoWithin 
+  operator so the format of the input will be the geometry 
+  first and then e need to specify the corordinates and the 
+  distance since it is an centerSphere geometry. Here since 
+  geoJSON takes co-ordinates in a longitude first and then 
+  latitude format, that is how we need to specify. */
+
+  /* Another important thing is before doing the geospatial 
+  queries we need to attribute index to the field where the 
+  geospatial data that we are searching for is stored or the 
+  field with which we are searching the data and that field 
+  should be geoJSON type */
   res.status(200).json({
     staus: 'success',
     result: tours.length,
@@ -193,6 +215,8 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
   });
 });
 
+/* This aggregator puts the distance field on each and every tour documents and returns all the tour documents as 
+the result of this aggregator. */
 exports.getDistances = catchAsync(async (req, res, next) => {
   const { latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');
@@ -210,12 +234,39 @@ exports.getDistances = catchAsync(async (req, res, next) => {
   const distances = await Tour.aggregate([
     {
       $geoNear: {
+        /* geoNear is the only geospatial aggregation 
+        pipeline stage that is available and it needs to be 
+        the first stage on the pipeline and it also needs 
+        atleast one of our field to be indexed with 
+        geosaptial index. If there is only one field with 
+        geospatial index then this geoNear stage will use 
+        that index automatically which is the 2d sphere for 
+        startLocation field in order to perform the
+        calculations, but if we had multiple fields with 
+        geospatial inded then we need to use keys parameter 
+        in order to specify the field with which we want to 
+        do the clculations. There are two mandatory fields 
+        in this geoNear stage they are near and 
+        distanceField. */
         near: {
+          /* near is the point from which to calculate 
+          distances, so all the distances will be calculated 
+          from this point that we define here to all the 
+          startLocation. near is the property that takes in 
+          the point from which the distance is measured and 
+          we need to specify this point as geoJSON (that is 
+          with type and co-ordinates) */
           type: 'Point',
           coordinates: [+lng, +lat],
         },
         distanceField: 'distance',
+        /* This is the name of the field that will be created 
+        and where all the calculated distances will be 
+        stored */
         distanceMultiplier: multiplier,
+        /* Here in distance multiplier we can secify a 
+        number which will be multiplied with all the 
+        distances */
       },
     },
     {
