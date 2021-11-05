@@ -92,5 +92,29 @@ if (photoSelect) {
   });
 }
 
+/* we need to show some kind of feedback to the user when 
+the booking is successful but this time it is not that 
+straight because usually we would make an api call and with 
+the response we will be using the javaScript to create the 
+alert but now we are not doing any api call it's the stripe 
+service which calls the success url when the payment becomes 
+successful so here we are creating a solution that we can 
+reuse and can be used all over the application. The first 
+thing that we are doing here is we are adding a query string 
+on too the success url but we can use that on any url that 
+directs us to our website as we have implemented in a way 
+that we can reuse it all over the application. Now in the 
+query string we are giving a parameter called alert, as per 
+the alert's value we will be creating the alert message and 
+display it on the website. Now we will create a middleware 
+that will be run before all the requests that we do for our 
+website and that middleware takes the alert value form the 
+query and creates as per the alert value and puts the 
+message on res.locals.alert, Now all the templates will 
+have a variable named alert and we are putting that alert 
+variable on the body element's data attribute and then we 
+will take that in the index.js and render a alert message 
+on the website.  */
+
 const alertMessage = document.querySelector('body').dataset.alert;
 if (alertMessage) showAlert('success', alertMessage, 20);
