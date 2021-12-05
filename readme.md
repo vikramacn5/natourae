@@ -7,7 +7,7 @@
 
 Build using modern technologies: node.js, express, mongoDB, mongoose and my teacher😀
 
-Natourae is a wabsite for booking adventurous tours. This is a fullstack web application built with user login, authentication, authorization, mailing, credit card payment with stripe, booking a tour, CRUD operations, integrated maps and even more.
+Natourae is a website for booking adventurous tours. This is a fullstack web application built with user login, authentication, authorization, mailing, credit card payment with stripe, booking a tour, CRUD operations, integrated maps and even more.
 
-Setup: 
-run ```npm start``` to start the server.
+Setup:
+run `npm start` to start the server.
