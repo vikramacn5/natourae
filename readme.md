@@ -3,7 +3,7 @@
 ### [Live site](https://natourae.herokuapp.com/)
 
 ![Natourae1](https://i.ibb.co/kBbMT9D/rsz-projectnatourae1.png)
-![Natourae2](https://i.ibb.co/QD7H8DR/project-Natourae3.png)
+![Natourae2](https://i.ibb.co/LkBbvyJ/rsz-projectnatourae2.png)
 
 Build using modern technologies: node.js, express, mongoDB, mongoose and my teacher😀
 
